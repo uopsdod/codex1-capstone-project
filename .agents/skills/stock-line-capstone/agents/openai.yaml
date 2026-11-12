@@ -1,4 +1,4 @@
 interface:
   display_name: "美股跌幅 LINE 通知核心功能建立"
   short_description: "代辦 n8n 行情與 LINE 通知建置，分階段驗證並交付可上線工作流"
-  default_prompt: "使用 $n8n-stock-line-capstone 建立並驗證我的美股跌幅 LINE 通知。"
+  default_prompt: "使用 $stock-line-capstone 建立並驗證我的美股跌幅 LINE 通知。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "n8n 工作流建置與驗證"
+  short_description: "使用官方 MCP 與 SDK 建置、修改及驗證通用 n8n 工作流並交付證據"
+  default_prompt: "使用 $n8n-workflow-builder 建立並驗證符合需求的 n8n 工作流。"

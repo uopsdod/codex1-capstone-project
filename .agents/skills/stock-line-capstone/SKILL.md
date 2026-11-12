@@ -1,5 +1,5 @@
 ---
-name: n8n-stock-line-capstone
+name: stock-line-capstone
 description: 建立、驗證與維護 Capstone 的 n8n 美股跌幅 LINE 個人通知，使用 Data Tables 與 Credentials；包含行情、Flex 卡片、排程及證據交接。LINE 留言改門檻為另行指定的延伸模式，不提供投資建議。
 ---
 
@@ -13,9 +13,13 @@ Codex 完成工具發現、建表、節點、程式、連線、憑證綁定與�
 
 這份 Skill 使用 Data Tables 與 Credentials，不沿用舊 workshop 的 Variables 路線。金鑰不放聊天、一般參數、程式、Data Tables 或分享檔。不要讀出既有秘密搬移，不索取 n8n Public API Key、不為課程升級方案。
 
+## 技術實作分工
+
+本 Skill 負責美股通知的業務規格與整合順序。n8n 的節點建置、SDK配置、修改與Execution驗證，請讀取並使用同課程的 $n8n-workflow-builder。將 [建置規格](references/build-spec.md)、prerequisite交接的專案／憑證與已授權測試範圍交給它；取得實測結果後，依本專案規則判斷是否可進入下一階段。不要求學員另外交辦通用Skill；由main在同一對話接續使用。若未安裝，先從同repository安裝，不宣稱已使用不存在的Skill。
+
 ## 執行順序
 
-前置帳號、MCP與憑證由 $n8n-stock-line-capstone-prerequisite 檢查。讀取其本次交接，沿用已驗證的帳號與憑證，不重複要求登入或填秘密；若未完成，先接續前置檢查。
+前置帳號、MCP與憑證由 $stock-line-capstone-prerequisite 檢查。讀取其本次交接，沿用已驗證的帳號與憑證，不重複要求登入或填秘密；若未完成，先接續前置檢查。
 
 1. 承接單元 2 已完成的環境建置，發現當前 n8n MCP 能力，讀取實例 context、官方 SDK、節點型別與驗證方式。若 MCP 工具尚未載入或連線失敗，回報具體原因並回到 TXT 的連線步驟，不改用瀏覽器冒充 MCP 成功。已連線時直接開始核心功能。
 2. 沿用單元 2 透過 MCP 建立並執行工作流的本次驗收證據，不重做連線驗收，不要求固定文字輸出。若沒有證據，依 TXT 完成建立與執行的 MCP 驗收後接續。
@@ -23,7 +27,7 @@ Codex 完成工具發現、建表、節點、程式、連線、憑證綁定與�
 4. 讀 [建置規格](references/build-spec.md)，先完成資料表與 Twelve Data 行情；此階段不索取 LINE 資料。用真實行情核算日期、價格及 changePct，驗證門檻來源，成功才進入 LINE。
 5. 準備 LINE 帳號與憑證，先唯讀 bot/info，再驗證 Flex JSON；取得本次真實發送授權後只執行一次。沒有達標股票時回報正常未發，不偷偷調門檻。若需臨時門檻或歷史重播，先說清楚具體測試取得授權，依規格隔離並還原。
 6. 等學員確認手機收到及版面後，依學員上線指示發布、啟用；只有「建立」的要求不自動視為每日啟用授權。讀回真正啟用版本，不只看草稿。首次排程未發生仍可交付，明列自動執行待驗證。
-7. 完成核心實作後產生非秘密交接摘要：工作流、資料表、憑證引用、股票與門檻、排程與啟用版本、本次測試Execution、手機回覆及待辦。告知下一步執行 $n8n-stock-line-capstone-checklist 做成果驗收，再交給 Obsidian Skill 整理；不能用歷史教材的成功代替本次驗證。
+7. 完成核心實作後產生非秘密交接摘要：工作流、資料表、憑證引用、股票與門檻、排程與啟用版本、本次測試Execution、手機回覆及待辦。告知下一步執行 $stock-line-capstone-checklist 做成果驗收，再交給 Obsidian Skill 整理；不能用歷史教材的成功代替本次驗證。
 
 ## 修改與延伸
 

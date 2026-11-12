@@ -1,5 +1,5 @@
 ---
-name: n8n-stock-line-capstone-prerequisite
+name: stock-line-capstone-prerequisite
 description: 在實作美股跌幅 LINE 通知前，盤點 n8n MCP、專案、Data Tables、Twelve Data 與 LINE 帳號及憑證，協助補齊缺項並交付可查證的前置檢查結果。
 ---
 
@@ -23,4 +23,4 @@ description: 在實作美股跌幅 LINE 通知前，盤點 n8n MCP、專案、Da
 
 用「前置項目／通過、未通過或待確認／證據與下一步」表回報。分開列帳號可登入、憑證存在、唯讀API可用、收件人已設定與好友本人確認。不把手機送達列前置通過，它是 main 實測事項。
 
-交接摘要包含本次查核時間、實例、專案ID、可用工具、工作流與設定表現況、非秘密憑證ID／類型、唯讀Execution連結、股票門檻與待補項。缺關鍵前置不宣稱就緒；已補齊則告知下一步執行 $n8n-stock-line-capstone。不自動重做已通過項目，不在此階段執行 main。
+交接摘要包含本次查核時間、實例、專案ID、可用工具、工作流與設定表現況、非秘密憑證ID／類型、唯讀Execution連結、股票門檻與待補項。缺關鍵前置不宣稱就緒；已補齊則告知下一步執行 $stock-line-capstone。不自動重做已通過項目，不在此階段執行 main。

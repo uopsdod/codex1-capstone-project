@@ -1,5 +1,5 @@
 ---
-name: n8n-stock-line-capstone-checklist
+name: stock-line-capstone-checklist
 description: 驗收已建立的美股跌幅 LINE 通知，讀回工作流、設定表與 Execution，核對行情、門檻、卡片、去重、手機收件及排程，分列通過與待驗證並提供證據。
 ---
 
