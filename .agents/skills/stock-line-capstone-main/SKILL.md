@@ -1,5 +1,5 @@
 ---
-name: stock-line-capstone
+name: stock-line-capstone-main
 description: 建立、驗證與維護 Capstone 的 n8n 美股跌幅 LINE 個人通知，使用 Data Tables 與 Credentials；包含行情、Flex 卡片、排程及證據交接。LINE 留言改門檻為另行指定的延伸模式，不提供投資建議。
 ---
 
