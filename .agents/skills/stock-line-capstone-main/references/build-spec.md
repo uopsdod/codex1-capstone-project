@@ -1,41 +1,19 @@
-# 建置規格
+# JSON 範本使用規格
 
-## 資料與憑證
+固定來源：[codex_ch05_n8n_股價波動_LINE通知_workflow.json](../assets/codex_ch05_n8n_股價波動_LINE通知_workflow.json)。直接使用此 JSON，不使用先前從零建置的 Data Tables／Flex 版本。
 
-同專案 stock_alert_settings：setting_key string、threshold_pct number、symbols string（逗號分隔）、line_user_id string、updated_at date。唯一設定鍵 stock_drop_threshold。新建值 2.5、TSM,NVDA,GOOGL，行情階段收件人可空。先查後建，重複列、缺列、非法值明確停止，不回退預設。用 Data Table 節點讀寫，不假設 Code 能直接讀表。每次手動及排程先讀唯一設定列，向後傳遞同一快照。
+## 保留範本
 
-「Twelve Data 行情」使用 Query Auth，Name=apikey，Value 由學員私密輸入。「LINE 股價提醒」使用獨立 Bearer Auth，只輸入 Token 原文。AI 準備表單、名稱、類型、專案與節點綁定；只讓學員填秘密並自行儲存。已有可用憑證沿用其 ID，不讀秘密。憑證不足時逐一交接；不要索取 Channel secret 來做單向推播。
+- 保留節點、連線、原始文字通知與紐約平日 17:00 排程；新工作流先不啟用。
+- 「通知門檻設定」：跌幅門檻（%）預設 2.5、股票代號預設 TSM／NVDA／GOOGL、LINE收件人UserID 由本次已確認本人資料回填。
+- 行情 HTTP 節點綁定既有「Twelve Data 行情」Query Auth；LINE HTTP 節點綁定既有「LINE 股價提醒」Bearer Auth。秘密不放 JSON、設定節點或 Code。
+- 沿用範本 static data 的股票＋交易日去重與 API 接受後記錄。手動重發及正式持久化須分開驗證；不能把一般查再寫宣稱為原子鎖。
+- MCP 若只支援 SDK，忠實轉換原 JSON；無法保留的欄位明列，不用另一套架構冒充原範本。
 
-## 行情與條件
+## 驗證與必要修復
 
-依當前 Twelve Data time_series 文件使用日線最近兩筆，確認 API 方案與符號實際可取，不承諾方案永遠足夠。排序日期後比較，驗證無 API 錯誤、至少兩個不同日期、有效且大於零的收盤價、預期股票／美國市場／USD，保留來源與查閱時間。缺資料或錯誤不能補零。
+依實際節點版本及官方 API 文件驗證配置；檢查行情回應結構、兩個有效日期、價格、門檻、本人收件人及訊息內容。確認 Code 中日期正規表示式、訊息換行與手動／排程判斷能在目前 n8n 執行環境正常工作，不只看匯入成功。
 
-changePct=(close-previousClose)/previousClose*100。判斷 changePct < -threshold_pct，用原始精度；等於不通知，上漲或持平不通知，0% 有效。只在顯示時保留兩位小數。嚴格邊界測試可用精確可表示的模擬價格及門檻避免誤把浮點誤差當作規則。
+若實測證實原範本有錯，僅修復必要範圍並回報差異；保留原始資產作可追溯來源，不默默改為 Data Tables、Flex 或其他設計。未測試的分支列待驗證。
 
-手動使用最新有效日線，盤中不能聲稱已收盤。正式排程 America/New_York，週一至五 17:00（cron 以當前節點能力核對）。正式採紐約當日日線，休市／未更新略過且記錄原因。週末／休市不以舊日線當當日再發。
-
-## LINE 與版型
-
-從 LINE Official Account Manager 啟用 Messaging API，再到同 Provider 的 Developers Console。已有帳號／Token 不重辦或 Reissue。學員完成條款、Provider 選擇、私密輸入及手機加好友。收件人使用同 channel 對應的本人 U 加 32 位十六進位 User ID，放私有設定列；不是 @ Basic ID。缺值或格式不符禁止發送，不用預設收件人。
-
-先 GET https://api.line.me/v2/bot/info，接著 POST https://api.line.me/v2/bot/message/validate/push 驗證 messages，再 POST https://api.line.me/v2/bot/message/push。當前端點與 JSON schema 要重新核對官方文件。Bearer 由憑證處理。無達標股票不產生訊息。
-
-Flex type=flex、動態 altText、bubble size=mega。深藍 header #193747、白色粗體16px、paddingAll 14px，標題 M/d 美股收盤跌幅提醒通知，日期用實際交易日。白色 body paddingAll14px，每檔三個文字元件：名稱（粗體）、收盤價：$xx.xx USD、單日漲跌：↓ x.xx%。內文15px #202A30，股票內 spacing4px，股票間 separator #E0E4E8 約10px 間距。footer #F0F2F5、padding12px、15px，顯示本次門檻及實際通知檔數。名稱台積電 · TSM、輝達 · NVDA、Google · GOOGL；箭頭依方向，百分比絕對值不加正負號。shrink-to-fit、wrap 備援，不固定高度或截字。單檔、多檔與空集合先檢查，手機版面由本人驗收。
-
-## 去重與失敗
-
-正式按股票＋交易日期持久去重，只有 LINE 接受後記錄 accepted，不寫 delivered。手動允許重發，不寫正式排程去重。使用同專案可查詢的持久紀錄，實際表名及欄位交接紀錄，別把一般查再寫當原子鎖。確認併發能力，必要時序列化／排除重疊執行；無法保證就列限制。LINE 成功但記錄失敗或網路結果不明時標為需核對，不自動重試造成重複。API 接受不能代替手機送達。
-
-## 測試設定
-
-預設不改正式門檻。學員具體授權暫改 0.5% 時先保存舊值、阻止正式並行讀到臨時值；無法隔離就不改。執行一次後不論成功失敗立即恢復並讀回，不等待手機確認。若期間他人更改不覆寫新值，報告衝突。0.5% 無股票達標就停，不再降低、不捏造行情。歷史重播限本人已成功真實行情，未啟用隔離副本，同版型邏輯且清楚標歷史，不當作即時端到端驗證。
-
-## 官方來源
-
-製作時於 2026-11-12 開啟：
-- https://docs.n8n.io/data/data-tables/
-- https://docs.n8n.io/integrations/builtin/credentials/httprequest/
-- https://developers.line.biz/en/reference/messaging-api/
-- https://twelvedata.com/docs
-
-執行時依實際介面與服務能力更新查核，不能把文件可行當成本帳號實測。帳號流程另查 LINE getting-started、getting-user-ids；排程以 IANA 時區換算，台灣為隔日05:00（美國夏令）或06:00（冬令），不寫全年固定時間。
+手動一次真實測試依 main 的範圍進行；沒有達標股票即回報正常未發並提出具體測試方案，不改正式門檻。手機收件、排程上線及第一次自動執行分開確認。
