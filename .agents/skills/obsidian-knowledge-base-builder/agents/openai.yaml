@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian 知識庫建置與維護"
+  short_description: "使用 MCP 搜尋及更新通用知識庫，保留內容並驗證連結與附件"
+  default_prompt: "使用 $obsidian-knowledge-base-builder 完成本次知識庫任務。"

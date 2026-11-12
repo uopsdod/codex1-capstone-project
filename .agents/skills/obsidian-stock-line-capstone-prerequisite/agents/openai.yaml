@@ -1,0 +1,4 @@
+interface:
+  display_name: "美股通知知識庫前置檢查"
+  short_description: "檢查 Obsidian MCP、Vault、既有筆記與來源證據並列出缺項"
+  default_prompt: "使用 $obsidian-stock-line-capstone-prerequisite 完成本次知識庫任務。"

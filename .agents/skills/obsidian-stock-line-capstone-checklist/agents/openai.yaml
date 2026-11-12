@@ -1,0 +1,4 @@
+interface:
+  display_name: "美股通知知識庫成果驗收"
+  short_description: "讀回專案筆記、連結與附件，核對證據及歷史與目前狀態"
+  default_prompt: "使用 $obsidian-stock-line-capstone-checklist 完成本次知識庫任務。"
