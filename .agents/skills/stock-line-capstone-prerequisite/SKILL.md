@@ -19,6 +19,29 @@ description: 在實作美股跌幅 LINE 通知前，盤點 n8n MCP、專案、Da
 
 金鑰只在 Credentials，不索取聊天中的秘密、不放 Data Tables／Variables／Code，不索取 n8n Public API Key或升級方案。工具不足以準備憑證時用可用介面準備表單，只交給學員私密輸入；網站註冊／條款由本人完成。依當前官方文件核對帳號與API流程，不把舊教材當現況。
 
+## 使用 Codex 內建瀏覽器完成憑證設定
+
+工作流建置與測試使用 n8n MCP。當 MCP 無法建立憑證或準備秘密欄位，直接使用 Codex 內建瀏覽器協助，不操控學員平常使用的 Chrome。這項分工由本 Skill 接續執行，不要求學員另貼一段瀏覽器 Prompt。
+
+1. 在內建瀏覽器開啟學員的 n8n，沿用已登入分頁。若需要登入，開好頁面並請學員完成後回覆「已登入，請繼續」，保留分頁等待。
+2. 準備目前需要的憑證表單與非秘密欄位。Twelve Data 使用 Query Auth，憑證名稱「Twelve Data 行情」，Name 設為 apikey；已存在的正確憑證沿用，不重建。
+3. 表單準備後，先依下一節引導學員取得 API Key，再交給學員私密貼入 Value 並按 Save。不讀取、顯示或要求金鑰貼聊天。
+4. LINE 憑證同樣由 Codex 準備表單、學員私密輸入及儲存；憑證類型為 Bearer Auth，名稱「LINE 股價提醒」，Token 原文不加 Bearer。LINE 帳號流程依當前官方介面逐步引導。
+5. 學員回報儲存後，使用 n8n MCP 查詢憑證中繼資料、綁定並做唯讀實測。儲存不等於 API 可用，結果分開回報。不要將需要人操作的全部步驟一次丟給學員。
+
+## 引導取得 Twelve Data API Key
+
+先確認是否已有帳號；沒有時開啟 https://twelvedata.com/ ，引導學員註冊與完成 Email 驗證；已建立帳號就沿用，不重問或重辦。必要登入、條款及私密操作由學員完成。
+
+在準備好 n8n 憑證表單後，逐步引導：
+1. 在 Codex 內建瀏覽器另開 Twelve Data 網站 https://twelvedata.com/ 並讓學員登入自己的帳號，保留 n8n 憑證表單分頁。
+2. 進入帳戶首頁 https://twelvedata.com/account，點選左側「API keys」，或首頁 API keys 區塊的「View」，進入 https://twelvedata.com/account/api-keys。若實際介面不同，依目前畫面引導。
+3. 請學員找到自己的 API Key。若隱藏，點「Reveal」，使用複製按鈕或自行複製完整金鑰。已有可用金鑰就沿用，不重新產生。這一步由學員操作，Codex 不讀取金鑰欄位或截取含金鑰畫面。
+4. 請學員回到 n8n「Twelve Data 行情」憑證表單，確認 Query Auth、Name=apikey，將金鑰貼入 Value 並按 Save。簡短提醒這裡填 Twelve Data API Key，不是網址、帳號密碼或 LINE Token，不貼聊天或作業筆記。
+5. 請學員回覆「憑證已儲存」，Codex 接續 MCP 綁定及行情驗證。只有取得真實行情才標 API 通過，不用儲存成功代替測試。
+
+以上操作路徑維護在本 Skill，課程 TXT 只需提供 prerequisite 的執行指令，不重複放入服務介面與憑證細節。
+
 ## 交付與銜接
 
 用「前置項目／通過、未通過或待確認／證據與下一步」表回報。分開列帳號可登入、憑證存在、唯讀API可用、收件人已設定與好友本人確認。不把手機送達列前置通過，它是 main 實測事項。
