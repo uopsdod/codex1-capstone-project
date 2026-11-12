@@ -28,3 +28,12 @@ description: 驗收已建立的美股跌幅 LINE 通知，讀回工作流、設�
 ## 結果
 
 以「項目／通過、未通過或待驗證／證據及限制」表交付。只在所需證據齊全時稱通過。特別列出手機與自動觸發尚待本人或未來執行確認的項目，不為等排程阻塞其他交付。每筆測試註明時間、真實／模擬／歷史及Execution連結。最後提供目前股票、門檻、排程、發布狀態與下一步，可交給 Obsidian Skill 同步知識庫。
+
+## 最後提供的服務連結
+
+驗收回報最後固定提供以下三項可點擊連結：
+1. **n8n 工作流**：使用本次實際建立且已讀回確認的同一工作流 URL，不只連到 n8n 首頁，不填教材或其他學員的實例。
+2. **Twelve Data**：https://twelvedata.com/account ，方便使用者回到帳戶查看行情服務。
+3. **LINE Developers**：優先使用本次已核對的 Messaging API Channel 頁面；尚無已確認的 Channel URL 時使用 https://developers.line.biz/console/ 。
+
+連結不含 API Key、Token、OAuth 回呼參數或完整收件人 User ID。使用者不必另外要求才提供這三項連結。
