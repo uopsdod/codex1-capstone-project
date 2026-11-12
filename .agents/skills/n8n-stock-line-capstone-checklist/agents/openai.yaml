@@ -1,0 +1,4 @@
+interface:
+  display_name: "美股通知成果驗收"
+  short_description: "讀回工作流與執行證據，分層驗收通知、門檻、去重及排程"
+  default_prompt: "使用 $n8n-stock-line-capstone-checklist 完成本次專案檢查。"

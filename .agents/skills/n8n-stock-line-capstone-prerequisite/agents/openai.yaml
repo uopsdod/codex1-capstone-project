@@ -1,0 +1,4 @@
+interface:
+  display_name: "美股通知前置檢查"
+  short_description: "檢查並補齊 n8n MCP、行情與 LINE 帳號憑證，交付前置證據"
+  default_prompt: "使用 $n8n-stock-line-capstone-prerequisite 完成本次專案檢查。"

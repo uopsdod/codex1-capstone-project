@@ -1,9 +1,12 @@
 # Codex Capstone：美股跌幅 LINE 通知
 
-課程 Skills：
-- `.agents/skills/n8n-stock-line-capstone`：n8n 行情、跌幅判斷、LINE Flex 通知與排程。
-- `.agents/skills/obsidian-stock-line-capstone`：Obsidian 專案紀錄、學習手冊連結與修改後維護。
+環境建置依課程 TXT 完成，不使用 Skills。單元 3 安裝後依序執行：
 
-環境建置依課程 TXT 完成，單元 3 才開始使用 Skills。取得後請保留完整資料夾與 references，依 TXT 的安裝 Prompt 操作。
+1. `n8n-stock-line-capstone-prerequisite`：前置檢查，補齊 MCP、帳號、API Key與LINE憑證。
+2. `n8n-stock-line-capstone`：main，實作行情、跌幅判斷、LINE Flex 通知及排程。
+3. `n8n-stock-line-capstone-checklist`：驗收實作結果，提供各項證據與待確認事項。
 
-目前為課程實作中的初稿。MCP 建立及手動執行已驗證；完整行情、LINE 收件及排程仍待端到端驗證。
+單元 4 使用 `obsidian-stock-line-capstone` 建立及維護專案知識庫。
+
+四個 Skill 均位於 `.agents/skills/`，安裝時保留完整資料夾與 references。
+目前為實作中的初稿。MCP建立及手動執行已驗證；完整通知仍待端到端驗證。
