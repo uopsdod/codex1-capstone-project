@@ -23,7 +23,8 @@
     },
     {
       "parameters": {
-        "jsCode": "const thresholdPct=Number($input.first().json['跌幅門檻（%）']);\nif(!Number.isFinite(thresholdPct)||thresholdPct<=0||thresholdPct>=100)throw new Error('跌幅門檻必須介於0與100之間。');\nconst now=$now.setZone('America/New_York');\nif($execution.mode==='production'&&(now.weekday>5||now.hour<17))return [];\nreturn [{json:{thresholdPct,symbols:$input.first().json['股票代號'],marketDate:now.toISODate(),checkedAt:now.toISO(),recipient:String($input.first().json['LINE收件人UserID']||'').trim()}}];"
+        "jsCode": "const thresholdPct=Number($input.first().json['跌幅門檻（%）']);\nif(!Number.isFinite(thresholdPct)||thresholdPct<=0||thresholdPct>=100)throw new Error('跌幅門檻必須介於0與100之間。');\nconst manual=$('手動測試').isExecuted;\nconst now=$now.setZone('America/New_York');\nif(!manual&&(now.weekday>5||now.hour<17))return [];\nreturn [{json:{manual,thresholdPct,symbols:$input.first().json['股票代號'],marketDate:now.toISODate(),checkedAt:now.toISO(),recipient:String($input.first().json['LINE收件人UserID']||'').trim()}}];",
+        "mode": "runOnceForAllItems"
       },
       "id": "53e41d14-4c47-4c8c-98e5-9270fcabecbb",
       "name": "股票與通知設定",
@@ -36,7 +37,8 @@
     },
     {
       "parameters": {
-        "jsCode": "const ctx=$('股票與通知設定').first().json;\nconst raw=$input.first().json;\nif(raw.status==='error')throw new Error('行情API失敗，請檢查憑證、額度或執行紀錄。');\nconst results=[];\nfor(const symbol of ctx.symbols){\n const r=raw[symbol];\n if(!r||r.status==='error'||!Array.isArray(r.values)||r.values.length<2)throw new Error(symbol+'：缺少兩個交易日資料，不計算跌幅。');\n if(r.meta?.symbol!==symbol||r.meta?.currency!=='USD'||r.meta?.exchange_timezone!=='America/New_York')throw new Error(symbol+'：行情市場或幣別不符。');\n const rows=[...r.values].sort((a,b)=>String(b.datetime).localeCompare(String(a.datetime)));\n const [latest,previous]=rows;\n if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(latest.datetime)||!/^\\d{4}-\\d{2}-\\d{2}$/.test(previous.datetime)||latest.datetime<=previous.datetime)throw new Error(symbol+'：交易日期異常。');\n if($execution.mode==='production'&&latest.datetime!==ctx.marketDate)continue;\n const a=Number(latest.close),b=Number(previous.close);\n if(!Number.isFinite(a)||!Number.isFinite(b)||a<=0||b<=0)throw new Error(symbol+'：收盤價無效。');\n const changePct=(a-b)/b*100;\n results.push({symbol,date:latest.datetime,previousDate:previous.datetime,close:a,previousClose:b,changePct,thresholdPct:ctx.thresholdPct,isDrop:changePct < -ctx.thresholdPct-1e-10});\n}\nreturn results.map(r=>({json:{...r,checkedAt:ctx.checkedAt,recipient:ctx.recipient}}));"
+        "jsCode": "const ctx=$('股票與通知設定').first().json;\nconst raw=$input.first().json;\nif(raw.status==='error')throw new Error('行情API失敗，請檢查憑證、額度或執行紀錄。');\nconst results=[];\nfor(const symbol of ctx.symbols){\n const r=raw[symbol];\n if(!r||r.status==='error'||!Array.isArray(r.values)||r.values.length<2)throw new Error(symbol+'：缺少兩個交易日資料，不計算跌幅。');\n if(r.meta?.symbol!==symbol||r.meta?.currency!=='USD'||r.meta?.exchange_timezone!=='America/New_York')throw new Error(symbol+'：行情市場或幣別不符。');\n const rows=[...r.values].sort((a,b)=>String(b.datetime).localeCompare(String(a.datetime)));\n const [latest,previous]=rows;\n if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(latest.datetime)||!/^\\d{4}-\\d{2}-\\d{2}$/.test(previous.datetime)||latest.datetime<=previous.datetime)throw new Error(symbol+'：交易日期異常。');\n if(!ctx.manual&&latest.datetime!==ctx.marketDate)continue;\n const a=Number(latest.close),b=Number(previous.close);\n if(!Number.isFinite(a)||!Number.isFinite(b)||a<=0||b<=0)throw new Error(symbol+'：收盤價無效。');\n const changePct=(a-b)/b*100;\n results.push({symbol,date:latest.datetime,previousDate:previous.datetime,close:a,previousClose:b,changePct,thresholdPct:ctx.thresholdPct,isDrop:changePct < -ctx.thresholdPct-1e-10});\n}\nreturn results.map(r=>({json:{...r,checkedAt:ctx.checkedAt,recipient:ctx.recipient}}));",
+        "mode": "runOnceForAllItems"
       },
       "id": "acf42869-bb25-40f8-890f-50a218a613da",
       "name": "驗證行情並計算漲跌幅",
@@ -83,7 +85,8 @@
     },
     {
       "parameters": {
-        "jsCode": "const store=$getWorkflowStaticData('global');const sent=store.sent||{};\nconst manual=$execution.mode!=='production';\nconst alerts=$input.all().map(i=>i.json).filter(r=>manual||!sent[r.symbol+':'+r.date]);\nif(!alerts.length)return [];\nconst names={TSM:'台積電',NVDA:'輝達',GOOGL:'Google'};\nconst parts=alerts[0].date.split('-');\nconst dateLabel=Number(parts[1])+'/'+Number(parts[2]);\nconst text=dateLabel+' 美股收盤漲跌幅提醒 (門檻 '+alerts[0].thresholdPct+'%)\\n\\n'+alerts.map(r=>(names[r.symbol]||r.symbol)+'/'+r.symbol+'\\n\\n- 本日收盤價: $'+Number(r.close).toFixed(2)+' USD\\n- 單日漲跌: '+Number(r.changePct).toFixed(2)+'%').join('\\n\\n');\nconst source={url:'https://twelvedata.com/',checkedAt:alerts[0].checkedAt};\nif(!/^U[0-9a-f]{32}$/.test(alerts[0].recipient))throw new Error('通知對象尚未設定；請由 Codex 確認 LINE User ID 後回填通知門檻設定。');\nreturn [{json:{keys:manual?[]:alerts.map(r=>r.symbol+':'+r.date),source,body:{to:alerts[0].recipient,messages:[{type:'text',text}]}}}];"
+        "jsCode": "const store=$getWorkflowStaticData('global');const sent=store.sent||{};\nconst manual=$('股票與通知設定').first().json.manual;\nconst alerts=$input.all().map(i=>i.json).filter(r=>manual||!sent[r.symbol+':'+r.date]);\nif(!alerts.length)return [];\nif(new Set(alerts.map(r=>r.date)).size!==1)throw new Error('通知股票交易日期不一致');\nif(!/^U[0-9a-f]{32}$/.test(alerts[0].recipient))throw new Error('尚未設定本人LINE收件人');\nconst names={TSM:'台積電',NVDA:'輝達',GOOGL:'Google'};\nconst parts=alerts[0].date.split('-');const dateLabel=Number(parts[1])+'/'+Number(parts[2]);\nconst contents=[];\nfor(const r of alerts){\n if(contents.length)contents.push({type:'separator',color:'#E0E4E8',margin:'10px'});\n contents.push({type:'box',layout:'vertical',spacing:'4px',margin:contents.length?'10px':'none',contents:[\n {type:'text',text:(names[r.symbol]?names[r.symbol]+' · ':'')+r.symbol,weight:'bold',size:'15px',color:'#202A30',wrap:true,adjustMode:'shrink-to-fit'},\n {type:'text',text:'收盤價：$'+Number(r.close).toFixed(2)+' USD',size:'15px',color:'#202A30',wrap:true,adjustMode:'shrink-to-fit'},\n {type:'text',text:'單日漲跌：'+(r.changePct<0?'↓ ':r.changePct>0?'↑ ':'→ ')+Math.abs(r.changePct).toFixed(2)+'%',size:'15px',color:'#202A30',wrap:true,adjustMode:'shrink-to-fit'}]});\n}\nconst title=dateLabel+' 美股收盤跌幅提醒通知';\nconst message={type:'flex',altText:title+'｜'+alerts.map(r=>r.symbol).join('、'),contents:{type:'bubble',size:'mega',\nheader:{type:'box',layout:'vertical',backgroundColor:'#193747',paddingAll:'14px',contents:[{type:'text',text:title,color:'#FFFFFF',weight:'bold',size:'16px',wrap:true,adjustMode:'shrink-to-fit'}]},\nbody:{type:'box',layout:'vertical',backgroundColor:'#FFFFFF',paddingAll:'14px',contents},\nfooter:{type:'box',layout:'vertical',backgroundColor:'#F0F2F5',paddingAll:'12px',contents:[{type:'text',text:'符合跌幅 '+alerts[0].thresholdPct+'% 門檻：'+alerts.length+' 檔',size:'15px',color:'#202A30',wrap:true,adjustMode:'shrink-to-fit'}]}}};\nreturn [{json:{keys:manual?[]:alerts.map(r=>r.symbol+':'+r.date),source:{url:'https://twelvedata.com/',checkedAt:alerts[0].checkedAt},body:{to:alerts[0].recipient,messages:[message]}}}];",
+        "mode": "runOnceForAllItems"
       },
       "id": "3a087a15-e3f3-41b9-ab0b-8e1ac66c66f3",
       "name": "整理提醒並排除重複",
@@ -125,7 +128,8 @@
     },
     {
       "parameters": {
-        "jsCode": "const response=$input.first().json;\nif(response.statusCode!==200)throw new Error('LINE API未確認成功，未記錄已通知。');\nconst sent=$getWorkflowStaticData('global');sent.sent??={};\nfor(const key of $('整理提醒並排除重複').first().json.keys)sent.sent[key]=$now.toISO();\nreturn [{json:{acceptedByLine:true,checkedAt:$now.toISO()}}];"
+        "jsCode": "const response=$input.first().json;\nif(response.statusCode!==200)throw new Error('LINE API未確認成功，未記錄已通知。');\nconst sent=$getWorkflowStaticData('global');sent.sent??={};\nfor(const key of $('整理提醒並排除重複').first().json.keys)sent.sent[key]=$now.toISO();\nreturn [{json:{acceptedByLine:true,checkedAt:$now.toISO()}}];",
+        "mode": "runOnceForAllItems"
       },
       "id": "61e15fb3-a41d-4dc4-bf69-60158e053b60",
       "name": "記錄LINE已接受通知",
@@ -233,6 +237,17 @@
         224
       ],
       "notes": "股票與門檻保留預設值；LINE 收件人由 Codex 於最後的帳號連接階段確認並回填。"
+    },
+    {
+      "name": "手動測試",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "parameters": {},
+      "position": [
+        0,
+        400
+      ],
+      "id": "capstone-manual-trigger"
     }
   ],
   "connections": {
@@ -318,6 +333,17 @@
         [
           {
             "node": "LINE個人跌幅提醒",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "手動測試": {
+      "main": [
+        [
+          {
+            "node": "通知門檻設定",
             "type": "main",
             "index": 0
           }
