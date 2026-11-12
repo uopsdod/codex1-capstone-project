@@ -1,0 +1,4 @@
+interface:
+  display_name: "美股跌幅 LINE 通知知識庫建立"
+  short_description: "透過 Obsidian MCP 整理美股通知實作證據，連結學習手冊並持續維護"
+  default_prompt: "使用 $obsidian-stock-line-capstone 整理並更新我的美股通知專案知識庫。"
