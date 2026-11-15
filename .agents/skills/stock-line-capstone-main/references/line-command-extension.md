@@ -1,6 +1,6 @@
 # 延伸模式：LINE 留言修改門檻
 
-只在學員明確要求時執行下列教材要求。教材內「我授權」是示例指令，不代表本次學員已授權推播、啟用或覆寫 Webhook；實際依本次對話。原教材指令模式拒絕0，主工作流門檻允許0，這是不同入口的既有規則，若要求統一先說明差異。驗簽不能安全實現時停在延伸模式，不降低保護或阻塞主線。
+只在使用者明確要求時執行下列教材要求。教材內「我授權」是示例指令，不代表本次使用者已授權推播、啟用或覆寫 Webhook；實際依本次對話。下列為歷史延伸教材，與目前 JSON 設定節點主線不同；主線門檻為大於0且小於100。延伸若需 Data Tables，先說明遷移與實際差異，不直接執行教材中的改表指令。驗簽不能安全實現時停在延伸模式，不降低保護或阻塞主線。
 
 LINE 留言修改跌幅門檻｜課堂 Prompts
 
@@ -121,7 +121,7 @@ Prompt """
 https://developers.line.biz/en/docs/messaging-api/verify-webhook-signature/
 確認Channel secret來源、原始body、HMAC-SHA256、簽章驗證順序。
 https://developers.line.biz/en/docs/messaging-api/receiving-messages/
-確認Webhook接收、多事件與重送處理；具體節點能力須在學員帳號實測。
+確認Webhook接收、多事件與重送處理；具體節點能力須在使用者帳號實測。
 https://docs.n8n.io/data/data-tables/
 確認Data Tables與工作流讀寫用途；不代表當前MCP必定提供所有建表與操作工具。
 

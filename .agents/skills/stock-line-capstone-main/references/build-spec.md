@@ -1,10 +1,10 @@
 # JSON 範本使用規格
 
-固定來源：[codex_ch05_n8n_股價波動_LINE通知_workflow.json](../assets/codex_ch05_n8n_股價波動_LINE通知_workflow.json)。直接使用此 JSON，不使用先前從零建置的 Data Tables／Flex 版本。
+固定來源：[codex_ch05_n8n_股價波動_LINE通知_workflow.json](../assets/codex_ch05_n8n_股價波動_LINE通知_workflow.json)。直接使用此 JSON，不使用先前另建的 Data Tables 架構；訊息使用此資產現有 Flex 卡片版型。
 
 ## 保留範本
 
-- 保留節點、連線、原始Flex 卡片通知與紐約平日 17:00 排程；新工作流先不啟用。
+- 保留節點、連線、目前 Flex 卡片通知與紐約平日 17:00 排程；新工作流先不啟用。
 - 「通知門檻設定」：跌幅門檻（%）預設 2.5、股票代號預設 TSM／NVDA／GOOGL、LINE收件人UserID 由本次已確認本人資料回填。
 - 行情 HTTP 節點綁定既有「Twelve Data 行情」Query Auth；LINE HTTP 節點綁定既有「LINE 股價提醒」Bearer Auth。秘密不放 JSON、設定節點或 Code。
 - 沿用範本 static data 的股票＋交易日去重與 API 接受後記錄。手動重發及正式持久化須分開驗證；不能把一般查再寫宣稱為原子鎖。
