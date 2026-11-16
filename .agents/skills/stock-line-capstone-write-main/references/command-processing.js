@@ -1,7 +1,7 @@
 function parseCommand(text){
  if(typeof text!=='string')return {kind:'invalid'};
  const t=text.trim(); if(t==='查詢門檻')return {kind:'query'};
- const m=/^門檻\s+(\d{1,2}(?:\.\d{1,2})?)\s*%?$/.exec(t);
+ const m=/^門檻(?:改成\s*|\s+)(\d{1,2}(?:\.\d{1,2})?)\s*%?$/.exec(t);
  if(!m)return {kind:'invalid'};
  const value=Number(m[1]);return value>0&&value<100?{kind:'update',value}:{kind:'invalid'};
 }
@@ -19,7 +19,7 @@ function planEvents(row,events,now,commit){
   if(cmd.kind==='update'&&e.timestamp<=last){action='stale';text='這則修改指令比目前設定舊，未變更門檻。請重新傳送新的指令。';}
   else if(cmd.kind==='update'){threshold=cmd.value;last=e.timestamp;changed=true;text='已將跌幅門檻從 '+before+'% 改為 '+threshold+'%，下次股價檢查起生效。';}
   else if(cmd.kind==='query')text='目前跌幅門檻為 '+threshold+'%。';
-  else text='請輸入「門檻 3%」或「查詢門檻」。門檻須大於0、小於100，最多兩位小數。';
+  else text='請輸入「門檻改成 3%」或「查詢門檻」。門檻須大於0、小於100，最多兩位小數。';
   seen[id]={timestamp:e.timestamp,action,before,after:threshold,commit,status:'reply_reserved'};
   replies.push({eventId:id,timestamp:e.timestamp,action,before,after:threshold,text,replyToken:e.replyToken});
  }
