@@ -28,3 +28,7 @@ signatureEqual 比對簽章，失敗走403，且不到設定表／LINE節點。�
 8. LINE真正Verify、本人傳指令與手機看到回覆屬上線後驗證。以同一secret自行簽署的fixture只證明程式一致，尚不證明secret與LINE Channel實際相符。沒有本人新證據不得標手機通過。
 
 資料表、工作流、憑證與Execution ID皆由當次工具取得，不套用本次老師實例。測試流程命名含隔離／不發送、不啟用；已有流程就接續，不重建。測試表欄位與正式表相符但資料分開，完成不自動刪除成果或回復本人正式新門檻。
+
+## 正式 Verify 顯示逾時時
+
+先以 MCP 查本次正式 Execution：若已通過簽章、處理有效空 events、沒有寫設定或發訊息，可再做一次 Verify。以 LINE 實際顯示 Success 和對應正式 Execution 同時取證；不把 n8n 執行成功直接當成 LINE 驗證成功。持續逾時先排查耗時，不無限重試。讀回 Use webhook、自動回應及 Webhook redelivery 的實際狀態；redelivery 關閉時，不承諾競爭回503會自動重送。
