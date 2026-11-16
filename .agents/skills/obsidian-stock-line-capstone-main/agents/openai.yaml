@@ -1,4 +1,4 @@
 interface:
   display_name: "美股通知知識庫實作"
-  short_description: "整理專案需求與實測證據，建立連結並保留修改後維護紀錄"
+  short_description: "整理通知與LINE指令成果，維護目前設定、歷史證據及雙向入口"
   default_prompt: "使用 $obsidian-stock-line-capstone-main 完成本次知識庫任務。"
