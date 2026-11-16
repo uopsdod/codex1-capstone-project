@@ -1,4 +1,4 @@
 interface:
   display_name: "LINE 留言修改門檻：前置檢查"
-  short_description: "LINE 留言修改門檻：前置檢查，沿用原通知專案並以實際證據確認結果"
+  short_description: "檢查原通知、連線及驗簽憑證，補齊登入後交付可開始建置的狀態"
   default_prompt: "請使用 $stock-line-capstone-write-prerequisite 完成 LINE 留言修改跌幅門檻的前置檢查。"

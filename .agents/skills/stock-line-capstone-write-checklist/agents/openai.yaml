@@ -1,4 +1,4 @@
 interface:
   display_name: "LINE 留言修改門檻：成果驗收"
-  short_description: "LINE 留言修改門檻：成果驗收，沿用原通知專案並以實際證據確認結果"
+  short_description: "驗收LINE指令與共用門檻，以實際證據區分通過及待驗證"
   default_prompt: "請使用 $stock-line-capstone-write-checklist 完成 LINE 留言修改跌幅門檻的成果驗收。"

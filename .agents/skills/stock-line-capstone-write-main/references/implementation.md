@@ -1,4 +1,4 @@
-# LINE 指令建置：已實測路徑
+# LINE 指令建置規格與實測注意事項
 
 ## 共用設定與條件更新
 
@@ -8,11 +8,11 @@
 
 目前個人模式保留24小時內最多5000個事件紀錄，拒絕過期／過度超前事件，防止移除舊去重鍵後又重播更新。超限停止，不默默丟紀錄。批次先依事件時間排序；較舊或同時刻的後到門檻指令不覆蓋現值。主張適用本人低流量用途，不承諾任意高併發或LINE必定重送。可恢復的競爭回503需配合LINE的重送設定；狀態不明先查紀錄。
 
-更新、查詢、格式錯誤與過時指令均先在事件狀態記錄前後值、commit及reply_reserved，再回覆。另在指令紀錄表保存event_id、event_timestamp、old_threshold、new_threshold、action、status、execution_id、recorded_at，不保存Token、原始訊息或完整User ID。回覆用reply API，不使用push；分記reply_reserved／reply_accepted／reply_rejected／reply_unknown。不在不明結果下重用replyToken；設定已成功但回覆失敗仍保留設定成功的事實，不稱手機已收到。
+更新、查詢、格式錯誤與過時指令均先在事件狀態記錄前後值、commit及reply_reserved，再回覆。查詢不改threshold_pct，但仍可遞增state_version並保存去重紀錄；不能把這種技術寫入當作修改業務門檻。另在指令紀錄表保存event_id、event_timestamp、old_threshold、new_threshold、action、status、execution_id、recorded_at，不保存Token、原始訊息或完整User ID。回覆用reply API，不使用push；分記reply_reserved／reply_accepted／reply_rejected／reply_unknown。不在不明結果下重用replyToken；設定已成功但回覆失敗仍保留設定成功的事實，不稱手機已收到。
 
 ## 原始請求與驗簽
 
-本次實例的 Crypto v2 使用 crypto Credentials，Hmac Secret 存在受保護憑證；HMAC action 設SHA256、base64、binaryData=true，binaryPropertyName=data。Webhook開rawBody。Code用 this.helpers.getBinaryDataBuffer(0,'data') 取得原始位元組；缺資料停止，不能重新JSON序列化冒充原文。先保存 rawBody UTF-8 字串與receivedSignature供驗簽後解析，再讓Crypto對原始binary計算。Crypto輸出不保留binary，後續不可假設它存在；測試產生簽章後若需重建fixture binary，只使用已知隔離原文，不讀取secret。
+已實測的路徑使用 Crypto v2 與 crypto Credentials；先核對目標環境是否支援。Crypto v2 使用 crypto Credentials，Hmac Secret 存在受保護憑證；HMAC action 設SHA256、base64、binaryData=true，binaryPropertyName=data。Webhook開rawBody。Code用 this.helpers.getBinaryDataBuffer(0,'data') 取得原始位元組；缺資料停止，不能重新JSON序列化冒充原文。先保存 rawBody UTF-8 字串與receivedSignature供驗簽後解析，再讓Crypto對原始binary計算。Crypto輸出不保留binary，後續不可假設它存在；測試產生簽章後若需重建fixture binary，只使用已知隔離原文，不讀取secret。
 
 signatureEqual 比對簽章，失敗走403，且不到設定表／LINE節點。通過後才JSON.parse、核對本人及事件種類。有效空events／無可處理事件回200。真正更新通過條件提交及讀回才回HTTP200，再處理reply；接收、設定寫入與reply接受分開。
 
@@ -24,7 +24,7 @@ signatureEqual 比對簽章，失敗走403，且不到設定表／LINE節點。�
 4. 相同原始資料程式的簽章正確、內容竄改、簽章缺失案例。
 5. 正式指令草稿的Test URL實際HTTP：缺失簽章403、正確簽章空events200、改動原文403。MCP execute_workflow 的 webhookData 在本次環境沒有提供raw binary，會被安全阻擋；不為測試放寬正式驗簽。可用內建瀏覽器按 Execute workflow 啟動測試接收，再對工具讀回的Test URL發送已知隔離請求，仍由MCP讀回Execution；標明瀏覽器啟動、實際HTTP與MCP取證，不能冒稱MCP輸入已通過原始HTTP驗簽。
 6. 建立隔離指令副本，只換模擬本人與測試表，移除所有LINE回覆節點；用簽署的模擬事件測完整提交、讀回與重送，確認沒有動正式資料或發LINE。
-7. 原通知無推播副本讀正式共用值，確認真實行情計算、IF與Flex使用相同門檻。保留原功能、憑證與排程，驗證後依main範圍發布遷移版。新指令入口仍維持草稿，待上線指示才啟用並替換舊Webhook。
+7. 原通知無推播副本讀正式共用值，確認真實行情計算、IF與Flex使用相同門檻。保留原功能、憑證與排程，驗證後依main範圍發布遷移版。新指令入口維持草稿，待上線指示才啟用並設定正式Webhook；首次設定為預設，既有入口才處理替換。
 8. LINE真正Verify、本人傳指令與手機看到回覆屬上線後驗證。以同一secret自行簽署的fixture只證明程式一致，尚不證明secret與LINE Channel實際相符。沒有本人新證據不得標手機通過。
 
 資料表、工作流、憑證與Execution ID皆由當次工具取得，不套用本次老師實例。測試流程命名含隔離／不發送、不啟用；已有流程就接續，不重建。測試表欄位與正式表相符但資料分開，完成不自動刪除成果或回復本人正式新門檻。
@@ -32,3 +32,29 @@ signatureEqual 比對簽章，失敗走403，且不到設定表／LINE節點。�
 ## 正式 Verify 顯示逾時時
 
 先以 MCP 查本次正式 Execution：若已通過簽章、處理有效空 events、沒有寫設定或發訊息，可再做一次 Verify。以 LINE 實際顯示 Success 和對應正式 Execution 同時取證；不把 n8n 執行成功直接當成 LINE 驗證成功。持續逾時先排查耗時，不無限重試。讀回 Use webhook、自動回應及 Webhook redelivery 的實際狀態；redelivery 關閉時，不承諾競爭回503會自動重送。
+
+## 共用程式的使用契約
+
+- parseCommand只解析句型，不寫資料；對外預設提示「門檻改成 2%」，舊格式僅保留相容。
+- eligibleEvents必須在簽章通過後呼叫，owner由本次原通知的已確認本人路由提供；傳入完整events陣列，不只處理第一筆。
+- planEvents接收唯一有效列、已驗證本人事件、目前時間及本次Execution識別，回傳候選及reply資料，本身不寫表。不能只呼叫它就宣稱已更新成功。
+- 更新節點以allConditions比對rowId與oldVersion，寫入候選thresholdPct／updatedAt／newVersion／eventState。更新回應若沒有列，設計明確的競爭失敗分支，避免空輸出直接跳過Webhook回應。
+- 修改後重新讀取，核對提交結果及事件commit標記；成功後才產生reply項目。重送沒有新reply項目時正常回200，不補送訊息。
+- 查無唯一設定列須以明確錯誤路徑停止；若使用alwaysOutputData維持錯誤檢查，必須搭配缺列檢查，不能把空物件當有效設定。
+- 建置時範例output應使用真實節點輸出欄位的形狀，避免SDK偵測到不存在的欄位。新增設定讀取節點後，檢查下游資料來源及原畫布分組是否仍有效。
+- 事件／回覆紀錄只保存必要結果，不保存Channel secret、access token、replyToken或完整原始敏感請求。讀取Execution只取必要節點及欄位，不把完整結果倒入聊天或教材。
+
+## 單次設定測試卡片（另行要求才執行）
+
+本人明確要求一次測試通知時，先使用不推播路徑讀取目前股票、共用門檻及最新有效行情。若沒有達標，不把它寫成故障，也不改門檻；可依這次測試要求發一則明標「設定測試」的同版Flex卡片，列出當前股票、實際行情日期、門檻及「目前無股票達標」。先以validate/push驗證格式，再只push授權次數；API接受後等本人確認或截圖。使用隔離測試流程，不改原通知排程或寫正式去重，不拿測試卡片當首次自動執行或真實達標證據。
+
+## 課程交接
+
+這份規格不要求Obsidian存在，也不自動同步筆記。main完成建置、上線及本人測試後交給write checklist；驗收後才進入Obsidian單元，使用非秘密摘要接續。所有工作流、資料表、憑證及門檻都從當次實例取得，2%是語法範例，不是建置初始化預設。
+
+官方參考（使用時核對當前版本）：
+- [LINE原始body簽章驗證](https://developers.line.biz/en/docs/messaging-api/verify-webhook-signature/)
+- [LINE接收訊息與重送](https://developers.line.biz/en/docs/messaging-api/receiving-messages/)
+- [LINE Messaging API](https://developers.line.biz/en/reference/messaging-api/)
+- [n8n Crypto憑證](https://docs.n8n.io/integrations/builtin/credentials/crypto/)
+- [n8n Data Tables](https://docs.n8n.io/data/data-tables/)
