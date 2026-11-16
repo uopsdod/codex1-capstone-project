@@ -1,5 +1,7 @@
 # 延伸模式：LINE 留言修改門檻
 
+現行建置請依序使用 $stock-line-capstone-write-prerequisite、$stock-line-capstone-write-main、$stock-line-capstone-write-checklist。下方課堂 Prompts 保留作歷史參考；其中固定測試數值、授權文字與瀏覽器備援不覆蓋新 Skills 的範圍與本次使用者指示。
+
 只在使用者明確要求時執行下列教材要求。教材內「我授權」是示例指令，不代表本次使用者已授權推播、啟用或覆寫 Webhook；實際依本次對話。下列為歷史延伸教材，與目前 JSON 設定節點主線不同；主線門檻為大於0且小於100。延伸若需 Data Tables，先說明遷移與實際差異，不直接執行教材中的改表指令。驗簽不能安全實現時停在延伸模式，不降低保護或阻塞主線。
 
 LINE 留言修改跌幅門檻｜課堂 Prompts

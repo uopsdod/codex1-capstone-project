@@ -45,6 +45,8 @@ Twelve Data 由 Query Auth 注入 apikey；LINE 由 Bearer Auth 注入 Authoriza
 
 ## 修改與延伸
 
+先確認目前設定來源。若已由 LINE 留言修改門檻系列完成共用設定遷移，門檻改動依 $stock-line-capstone-write-main 更新既有共用設定，不重新加回設定節點門檻或移除 Webhook；下方設定節點修改規則只適用於尚未遷移的單向通知。
+
 改股票或門檻時更新同一工作流的「通知門檻設定」節點，讀回確認。沿用範本的有效範圍 0 < threshold < 100，不改共用 JSON 原檔或另建設定表。新股票確認市場、USD 與名稱，未確認中文名稱就顯示代碼，不捏造。下一次執行採用新值，執行中保持原快照。改完交接 Obsidian 更新目前設定與變更紀錄。
 
 只有使用者明確要求 LINE 留言修改門檻時，讀 [LINE 指令延伸](references/line-command-extension.md)。不把該模式當作主線前置條件，不因現有方案不能安全驗簽而停住單向通知。
